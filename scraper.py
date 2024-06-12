@@ -48,8 +48,12 @@ for page in range(0, num_pages):
         listing_data['title'] = get_text_or_default(listing.find('h3', class_='truncate_title noprint'))
         
         # Extract the details
-        details = listing.find('div', class_='aditem-main--top--title')
+        details = listing.find('div', class_ = 'col-xs-11')
         listing_data['details'] = get_text_or_default(details)
+
+        # Extract the location
+        details = listing.find('div', class_ = 'col-xs-11')
+        listing_data['location'] = get_text_or_default(location)
         
         # Extract the price
         price = listing.find('b', class_='col-xs-3')
@@ -77,7 +81,7 @@ for page in range(0, num_pages):
         listing_data['online_status'] = online_status
         
         # Extract the description
-        description = listing.find('p')
+        description = listing.find('div', class_ = 'col-xs-11')
         listing_data['description'] = get_text_or_default(description)
         
         # Append the listing data to the list
