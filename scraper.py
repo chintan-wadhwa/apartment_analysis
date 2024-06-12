@@ -86,7 +86,7 @@ for page in range(0, num_pages):
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    time.sleep(1)  # Adjust delay as necessary
+    time.sleep(3)  # Adjust delay as necessary
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data)
