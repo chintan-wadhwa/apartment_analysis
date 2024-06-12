@@ -52,7 +52,7 @@ for page in range(1, num_pages + 1):
         listing_data['details'] = get_text_or_default(details)
         
         # Extract the price
-        price = listing.find('b', class_='key_fact_value')
+        price = listing.find('b', class_='col-xs-3')
         listing_data['price'] = get_text_or_default(price)
         
         # Extract the availability
