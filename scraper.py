@@ -7,7 +7,7 @@ import time
 base_url = "https://www.wg-gesucht.de/en/wg-zimmer-in-Duesseldorf.30.0.1.{page}.html"
 
 # Number of pages to scrape
-num_pages = 5  # Set the number of pages you want to scrape
+num_pages = 7  # Set the number of pages you want to scrape
 
 # Initialize a list to store the data
 data = []
@@ -17,7 +17,7 @@ def get_text_or_default(element, default='N/A'):
     return element.get_text(strip=True) if element else default
 
 # Loop through the specified number of pages
-for page in range(1, num_pages + 1):
+for page in range(0, num_pages):
     # Construct the URL for the current page
     url = base_url.format(page=page)
     
