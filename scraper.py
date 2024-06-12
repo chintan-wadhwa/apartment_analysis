@@ -29,7 +29,7 @@ for page in range(1, num_pages + 1):
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Find all listing elements
-    listings = soup.find_all('div', class_='wgg_card offer_list_item')
+    listings = soup.find_all('div', class_ ='wgg_card offer_list_item')
     if not listings:
         print(f"No listings found on page {page}, stopping.")
         break  # Stop if no more listings
