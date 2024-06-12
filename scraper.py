@@ -7,7 +7,7 @@ import time
 base_url = "https://www.wg-gesucht.de/en/wg-zimmer-in-Duesseldorf.30.0.1.{page}.html"
 
 # Number of pages to scrape
-num_pages = 7  # Set the number of pages you want to scrape
+num_pages = 3  # Set the number of pages you want to scrape
 
 # Initialize a list to store the data
 data = []
@@ -50,10 +50,6 @@ for page in range(0, num_pages):
         # Extract the details
         details = listing.find('div', class_ = 'col-xs-11')
         listing_data['details'] = get_text_or_default(details)
-
-        # Extract the location
-        details = listing.find('div', class_ = 'col-xs-11')
-        listing_data['location'] = get_text_or_default(location)
         
         # Extract the price
         price = listing.find('b', class_='col-xs-3')
