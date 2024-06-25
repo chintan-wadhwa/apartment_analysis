@@ -6,9 +6,6 @@ import time
 # Base URL for the website with placeholder for page number
 base_url = "https://www.wg-gesucht.de/en/wg-zimmer-in-Duesseldorf.30.0.1.{page}.html"
 
-# Number of pages to scrape
-num_pages = 3  # Set the number of pages you want to scrape
-
 # Initialize a list to store the data
 data = []
 
@@ -20,32 +17,30 @@ def get_text_or_default(element, default='N/A'):
 def extract_description(listing_url):
     response = requests.get(listing_url)
     response.raise_for_status()
+    response.encoding = 'utf-8'  # Ensure proper encoding
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    descriptions = {
-        "Room": "N/A",
-        "Location": "N/A",
-        "Flatshare": "N/A",
-        "Misc": "N/A"
-    }
+    description_parts = []
 
     for section in soup.find_all('div', class_='section_panel_tab'):
-        title = section.get_text(strip=True)
         section_id = section['data-text']
         description_div = soup.find('div', id=section_id[1:])
         if description_div:
-            descriptions[title] = get_text_or_default(description_div.find('p'))
+            description_parts.append(get_text_or_default(description_div.find('p')))
     
-    return descriptions
+    return ' '.join(description_parts)
 
-# Loop through the specified number of pages
-for page in range(0, num_pages):
+# Page counter
+page = 0
+
+while True:
     # Construct the URL for the current page
     url = base_url.format(page=page)
     
     # Make a request to the website
     response = requests.get(url)
     response.raise_for_status()
+    response.encoding = 'utf-8'  # Ensure proper encoding
     
     # Parse the content with BeautifulSoup
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -75,7 +70,8 @@ for page in range(0, num_pages):
         listing_data['details'] = get_text_or_default(details)
         
         # Extract the price
-        price = listing.find('b', class_='col-xs-3')
+        price_div = listing.find('div', class_='col-xs-3')
+        price = price_div.find('b') if price_div else None
         listing_data['price'] = get_text_or_default(price)
         
         # Extract the availability
@@ -101,8 +97,8 @@ for page in range(0, num_pages):
         
         # Extract the description from the full link page
         if full_link != 'N/A':
-            descriptions = extract_description(full_link)
-            listing_data.update(descriptions)
+            description = extract_description(full_link)
+            listing_data['description'] = description
         
         # Append the listing data to the list
         data.append(listing_data)
@@ -111,12 +107,15 @@ for page in range(0, num_pages):
     
     # Pause to respect website's request rate
     time.sleep(3)  # Adjust delay as necessary
+    
+    # Increment the page counter
+    page += 1
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data)
 
-# Save the DataFrame to a CSV file without encoding changes
-df.to_csv('wg_gesucht_duesseldorf_dynamic_manual_pages.csv', index=False, encoding='utf-8')
+# Save the DataFrame to a CSV file with correct encoding
+df.to_csv('wg_gesucht_duesseldorf_listings.csv', index=False, encoding='utf-8')
 
 # Print the DataFrame
 print(df)
