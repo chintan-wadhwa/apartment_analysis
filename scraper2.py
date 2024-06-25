@@ -16,20 +16,27 @@ data = []
 def get_text_or_default(element, default='N/A'):
     return element.get_text(strip=True) if element else default
 
-# Function to fetch the description from the detailed listing page
-def fetch_description(listing_url):
-    try:
-        response = requests.get(listing_url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Extract the description
-        description_div = soup.find('div', class_='panel-body description-text')
-        description = get_text_or_default(description_div.find('p'))
-        return description
-    except Exception as e:
-        print(f"Error fetching description from {listing_url}: {e}")
-        return 'N/A'
+# Function to extract description from the listing page
+def extract_description(listing_url):
+    response = requests.get(listing_url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    descriptions = {
+        "Room": "N/A",
+        "Location": "N/A",
+        "Flatshare": "N/A",
+        "Misc": "N/A"
+    }
+
+    for section in soup.find_all('div', class_='section_panel_tab'):
+        title = section.get_text(strip=True)
+        section_id = section['data-text']
+        description_div = soup.find('div', id=section_id[1:])
+        if description_div:
+            descriptions[title] = get_text_or_default(description_div.find('p'))
+    
+    return descriptions
 
 # Loop through the specified number of pages
 for page in range(0, num_pages):
@@ -44,7 +51,7 @@ for page in range(0, num_pages):
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Find all listing elements
-    listings = soup.find_all('div', class_ ='wgg_card offer_list_item')
+    listings = soup.find_all('div', class_='wgg_card offer_list_item')
     if not listings:
         print(f"No listings found on page {page}, stopping.")
         break  # Stop if no more listings
@@ -57,14 +64,14 @@ for page in range(0, num_pages):
         # Extract the full link
         link = listing.find('a', class_='detailansicht')
         full_link = link['href'] if link else 'N/A'
-        full_url = "https://www.wg-gesucht.de" + full_link if full_link != 'N/A' else 'N/A'
-        listing_data['full_link'] = full_url
+        full_link = "https://www.wg-gesucht.de" + full_link if full_link != 'N/A' else 'N/A'
+        listing_data['full_link'] = full_link
         
         # Extract the title
         listing_data['title'] = get_text_or_default(listing.find('h3', class_='truncate_title noprint'))
         
         # Extract the details
-        details = listing.find('div', class_ = 'col-xs-11')
+        details = listing.find('div', class_='col-xs-11')
         listing_data['details'] = get_text_or_default(details)
         
         # Extract the price
@@ -92,8 +99,10 @@ for page in range(0, num_pages):
                 break
         listing_data['online_status'] = online_status
         
-        # Fetch the description from the detailed listing page
-        listing_data['description'] = fetch_description(full_url)
+        # Extract the description from the full link page
+        if full_link != 'N/A':
+            descriptions = extract_description(full_link)
+            listing_data.update(descriptions)
         
         # Append the listing data to the list
         data.append(listing_data)
@@ -101,7 +110,7 @@ for page in range(0, num_pages):
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    time.sleep(1)  # Adjust delay as necessary
+    time.sleep(3)  # Adjust delay as necessary
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data)
