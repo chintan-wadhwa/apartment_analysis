@@ -25,7 +25,8 @@ for page in range(0, num_pages):
     # Make a request to the website
     response = requests.get(url)
     response.raise_for_status()
-    
+    response.encoding = 'utf-8'
+
     # Parse the content with BeautifulSoup
     soup = BeautifulSoup(response.content, 'html.parser')
     
@@ -53,7 +54,8 @@ for page in range(0, num_pages):
         listing_data['details'] = get_text_or_default(details)
         
         # Extract the price
-        price = listing.find('b', class_='col-xs-3')
+        price_div = listing.find('div', class_='col-xs-3')
+        price = price_div.find('b') if price_div else None
         listing_data['price'] = get_text_or_default(price)
         
         # Extract the availability
@@ -77,24 +79,20 @@ for page in range(0, num_pages):
                 break
         listing_data['online_status'] = online_status
         
-        # Extract the description
-        description = listing.find('div', class_ = 'col-xs-11')
-        listing_data['description'] = get_text_or_default(description)
-        
         # Append the listing data to the list
         data.append(listing_data)
     
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    delay = random.uniform(2,8)
+    delay = random.uniform(2,6)
     time.sleep(delay)  # Adjust delay as necessary
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data)
 
 # Save the DataFrame to a CSV file without encoding changes
-df.to_csv('wg_gesucht_duesseldorf_dynamic_manual_pages.csv', index=False, encoding='utf-8')
+df.to_csv('duesseldorf_listings_no_description.csv', index=False, encoding='utf-8')
 
 # Print the DataFrame
 print(df)

@@ -107,7 +107,7 @@ while True:
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    delay = random.uniform(2, 8)
+    delay = random.uniform(2, 7)
     time.sleep(delay)  # Adjust delay as necessary
     
     # Increment the page counter
@@ -117,7 +117,7 @@ while True:
 df = pd.DataFrame(data)
 
 # Save the DataFrame to a CSV file with correct encoding
-df.to_csv('duesseldorf_listings.csv', index=False, encoding='utf-8')
+df.to_csv('duesseldorf_listings_description.csv', index=False, encoding='utf-8')
 
 # Print the DataFrame
 print(df)
