@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import random
 
 # Base URL for the website with placeholder for page number
 base_url = "https://www.wg-gesucht.de/en/wg-zimmer-in-Duesseldorf.30.0.1.{page}.html"
@@ -86,7 +87,8 @@ for page in range(0, num_pages):
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    time.sleep(3)  # Adjust delay as necessary
+    delay = random.uniform(2,8)
+    time.sleep(delay)  # Adjust delay as necessary
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data)

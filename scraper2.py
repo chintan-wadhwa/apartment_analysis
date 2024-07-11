@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import random
 
 # Base URL for the website with placeholder for page number
 base_url = "https://www.wg-gesucht.de/en/wg-zimmer-in-Duesseldorf.30.0.1.{page}.html"
@@ -106,7 +107,8 @@ while True:
     print(f"Processed page {page}, found {len(listings)} listings.")
     
     # Pause to respect website's request rate
-    time.sleep(3)  # Adjust delay as necessary
+    delay = random.uniform(2, 8)
+    time.sleep(delay)  # Adjust delay as necessary
     
     # Increment the page counter
     page += 1
@@ -115,7 +117,7 @@ while True:
 df = pd.DataFrame(data)
 
 # Save the DataFrame to a CSV file with correct encoding
-df.to_csv('wg_gesucht_duesseldorf_listings.csv', index=False, encoding='utf-8')
+df.to_csv('duesseldorf_listings.csv', index=False, encoding='utf-8')
 
 # Print the DataFrame
 print(df)
